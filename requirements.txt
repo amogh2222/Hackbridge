@@ -1,0 +1,25 @@
+# HackBridge — AI-Enabled Hackathon Management Platform
+# Core dependencies
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-dotenv==1.0.1
+
+# Supabase
+supabase
+postgrest
+
+# AI / ML
+litellm==1.55.10
+sentence-transformers==3.3.1
+scipy
+numpy
+
+# Fuzzy matching for deduplication
+rapidfuzz==3.11.0
+
+# Seeding
+faker==33.1.0
+
+# CORS & HTTP
+httpx

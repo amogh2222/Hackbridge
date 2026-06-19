@@ -1,0 +1,2743 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HackBridge — Hackathon Operations Platform</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;0,700;0,800;0,900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap");
+
+      :root {
+        /* ── Dell brand core: flat hues only, no gradients/tints per brand standard ── */
+        --blue: #0076ce; /* Dell Blue, Pantone 2174 C */
+        --blue-dark: #00558f;
+        --navy: #0c2340; /* Dell deep ink */
+        --navy-2: #122d52;
+        --navy-3: #173764;
+
+        --ink: #11161c;
+        --ink-soft: #4b5563;
+        --paper: #ffffff;
+        --mist: #f3f6f9;
+        --mist-2: #e8edf2;
+        --line: #d9e1e8;
+        --line-dk: rgba(255, 255, 255, 0.14);
+        --line-dk-soft: rgba(255, 255, 255, 0.08);
+
+        --on-navy: #eff4f9;
+        --on-navy-dim: #93a8c2;
+        --on-navy-faint: #5e7396;
+
+        --green: #157a4e;
+        --green-on-navy: #3fd194;
+        --amber: #92600c;
+        --amber-on-navy: #f0a93b;
+        --red: #b3261e;
+
+        --disp: "Archivo", system-ui, sans-serif;
+        --font: "DM Sans", system-ui, sans-serif;
+        --mono: "DM Mono", monospace;
+
+        --r-card: 10px;
+        --r-sm: 6px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--paper);
+        color: var(--ink);
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      select {
+        font-family: var(--font);
+      }
+      ::selection {
+        background: rgba(0, 118, 206, 0.18);
+      }
+
+      /* ══════════════════════════════════════════════════════════
+   SIGNATURE MOTIF — Dell's angled "E" cut, used as a recurring
+   structural device instead of glow/gradient orbs.
+   ══════════════════════════════════════════════════════════ */
+      .e-cut-tr {
+        clip-path: polygon(0 0, 86% 0, 100% 30%, 100% 100%, 0 100%);
+      }
+      .e-notch {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        background: var(--paper);
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+      }
+
+      /* ── NAV ────────────────────────────────────────── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        height: 64px;
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.97);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+      .logo-mark {
+        width: 34px;
+        height: 34px;
+        background: var(--blue);
+        display: grid;
+        place-items: center;
+        font-family: var(--disp);
+        font-weight: 800;
+        font-size: 16px;
+        color: #fff;
+        letter-spacing: -0.5px;
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);
+      }
+      .brand-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .brand-name {
+        font-family: var(--disp);
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .brand-sub {
+        font-size: 9.5px;
+        font-weight: 600;
+        color: var(--blue);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-status {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .nav-status .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .btn-ghost {
+        padding: 8px 17px;
+        border: 1.5px solid var(--line);
+        background: transparent;
+        color: var(--ink-soft);
+        border-radius: var(--r-sm);
+        font: 600 13px/1 var(--font);
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+      }
+      .btn-ghost:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+
+      .btn-fill {
+        padding: 8px 19px;
+        background: var(--blue);
+        border: 1.5px solid var(--blue);
+        color: #fff;
+        border-radius: var(--r-sm);
+        font: 700 13px/1 var(--font);
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .btn-fill:hover {
+        background: var(--blue-dark);
+        border-color: var(--blue-dark);
+      }
+      .btn-fill:active {
+        transform: translateY(1px);
+      }
+
+      /* ── PAGE WRAPPER ───────────────────────────────── */
+      .page {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ── LANDING ────────────────────────────────────── */
+      #landingPage {
+        background: var(--paper);
+      }
+
+      .hero-band {
+        background: var(--navy);
+        padding: 128px 40px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Flat geometric field instead of a glow orb — solid shapes, hard edges */
+      .hero-band::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 46%;
+        height: 100%;
+        background: var(--navy-2);
+        clip-path: polygon(38% 0, 100% 0, 100% 100%, 0% 100%);
+      }
+      .hero-band::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 22%;
+        height: 100%;
+        background: var(--navy-3);
+        clip-path: polygon(55% 0, 100% 0, 100% 100%, 20% 100%);
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1fr 408px;
+        gap: 64px;
+        max-width: 1180px;
+        margin: 0 auto;
+        align-items: start;
+      }
+
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        padding-bottom: 64px;
+      }
+
+      .live-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--line-dk-soft);
+        padding: 6px 14px 6px 11px;
+        border-radius: 3px;
+        width: fit-content;
+      }
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--green-on-navy);
+      }
+      .live-text {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--on-navy-dim);
+        font-family: var(--mono);
+      }
+
+      .hero h1 {
+        font-family: var(--disp);
+        font-size: 52px;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        color: #fff;
+      }
+      .hero h1 span {
+        color: var(--blue);
+        display: block;
+      }
+      .hero h1 .underscore {
+        display: inline-block;
+        width: 46px;
+        height: 8px;
+        background: var(--blue);
+        margin-top: 14px;
+      }
+
+      .hero-sub {
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--on-navy-dim);
+        max-width: 460px;
+      }
+
+      .stats {
+        display: flex;
+        gap: 0;
+        padding-top: 8px;
+      }
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0 28px 0 0;
+        margin-right: 28px;
+        border-right: 1px solid var(--line-dk-soft);
+      }
+      .stat-item:last-child {
+        border-right: none;
+        margin-right: 0;
+        padding-right: 0;
+      }
+      .stat-num {
+        font-family: var(--disp);
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #fff;
+      }
+      .stat-lbl {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--on-navy-faint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      .trust-row {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        flex-wrap: wrap;
+      }
+      .trust-label {
+        font-size: 10.5px;
+        color: var(--on-navy-faint);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        white-space: nowrap;
+      }
+      .trust-chips {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      .trust-chip {
+        padding: 4px 10px;
+        border: 1px solid var(--line-dk-soft);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--on-navy-dim);
+        font-family: var(--mono);
+        letter-spacing: 0.01em;
+      }
+
+      /* ── AUTH CARD ───────────────────────────────────── */
+      .auth-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(3, 12, 26, 0.28);
+        transform: translateY(28px);
+      }
+
+      .card-top {
+        padding: 20px 26px 16px;
+        background: var(--mist);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 3px;
+        background: var(--mist-2);
+        border-radius: var(--r-sm);
+        padding: 3px;
+      }
+      .tab {
+        flex: 1;
+        padding: 9px;
+        border: none;
+        background: transparent;
+        color: var(--ink-soft);
+        border-radius: 4px;
+        font: 600 13px/1 var(--font);
+        cursor: pointer;
+        transition: all 0.18s;
+      }
+      .tab.on {
+        background: var(--navy);
+        color: #fff;
+      }
+      .tab:not(.on):hover {
+        color: var(--ink);
+      }
+
+      .card-body {
+        padding: 24px 26px 28px;
+      }
+
+      .role-lbl {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .role-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .role-tile {
+        position: relative;
+        padding: 13px 13px 11px;
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        background: var(--paper);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        user-select: none;
+      }
+      .role-tile:hover {
+        border-color: #9cc4e8;
+        background: #fafcfe;
+      }
+      .role-tile.chosen {
+        border-color: var(--blue);
+        background: rgba(0, 118, 206, 0.05);
+      }
+
+      .tile-check {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 16px;
+        height: 16px;
+        background: var(--blue);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .role-tile.chosen .tile-check {
+        opacity: 1;
+      }
+      .tile-check svg {
+        width: 9px;
+        height: 9px;
+        stroke: #fff;
+        stroke-width: 2.5;
+        fill: none;
+      }
+
+      .tile-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 8px;
+      }
+      .tile-icon svg {
+        width: 15px;
+        height: 15px;
+      }
+      .tile-icon.blue {
+        background: rgba(0, 118, 206, 0.1);
+      }
+      .tile-icon.blue svg {
+        stroke: var(--blue);
+      }
+      .tile-icon.amber {
+        background: rgba(146, 96, 12, 0.1);
+      }
+      .tile-icon.amber svg {
+        stroke: var(--amber);
+      }
+      .tile-icon.green {
+        background: rgba(21, 122, 78, 0.1);
+      }
+      .tile-icon.green svg {
+        stroke: var(--green);
+      }
+      .tile-icon.gray {
+        background: var(--mist-2);
+      }
+      .tile-icon.gray svg {
+        stroke: var(--ink-soft);
+      }
+
+      .tile-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .tile-desc {
+        font-size: 11px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+        line-height: 1.4;
+      }
+
+      .form-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .field label {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--ink-soft);
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--paper);
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--ink);
+        font: 400 13.5px/1 var(--font);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        -webkit-appearance: none;
+      }
+      .field input::placeholder {
+        color: #a6b0bc;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(0, 118, 206, 0.12);
+      }
+
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .form-link {
+        font-size: 11.5px;
+        color: var(--blue);
+        text-align: right;
+        cursor: pointer;
+        margin-top: -6px;
+        display: block;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .form-link:hover {
+        text-decoration: underline;
+      }
+
+      .cta-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--blue);
+        border: none;
+        border-radius: var(--r-sm);
+        color: #fff;
+        font: 700 14px/1 var(--font);
+        cursor: pointer;
+        margin-top: 2px;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .cta-btn:hover {
+        background: var(--blue-dark);
+      }
+      .cta-btn:active {
+        transform: translateY(1px);
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #a6b0bc;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .sso-btn {
+        width: 100%;
+        padding: 10px 14px;
+        background: var(--paper);
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--ink-soft);
+        font: 600 13px/1 var(--font);
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+      }
+      .sso-btn:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .sso-btn svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        fill: none;
+      }
+
+      .form-note {
+        font-size: 11px;
+        color: var(--ink-soft);
+        text-align: center;
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+      .form-note a {
+        color: var(--blue);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .err-msg {
+        font-size: 11.5px;
+        color: var(--red);
+        display: none;
+        font-weight: 600;
+      }
+
+      /* ── BELOW-FOLD MARKETING SECTIONS (light) ─────────── */
+      .lite-section {
+        background: var(--paper);
+        padding: 88px 40px;
+      }
+      .lite-section.alt {
+        background: var(--mist);
+      }
+      .section-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 20px;
+        height: 2px;
+        background: var(--blue);
+      }
+
+      .section-head {
+        max-width: 620px;
+        margin-bottom: 48px;
+      }
+      .section-head h2 {
+        font-family: var(--disp);
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--ink);
+      }
+      .section-head p {
+        font-size: 15px;
+        color: var(--ink-soft);
+        line-height: 1.7;
+        margin-top: 12px;
+      }
+
+      .flow-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        overflow: hidden;
+      }
+      .flow-step {
+        padding: 28px 24px;
+        background: var(--paper);
+        border-right: 1px solid var(--line);
+        position: relative;
+      }
+      .flow-step:last-child {
+        border-right: none;
+      }
+      .flow-num {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--blue);
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+      .flow-step h3 {
+        font-family: var(--disp);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 8px;
+      }
+      .flow-step p {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+      }
+      .flow-arrow {
+        position: absolute;
+        top: 28px;
+        right: -7px;
+        z-index: 2;
+        width: 14px;
+        height: 14px;
+        background: var(--paper);
+        border-top: 1px solid var(--line);
+        border-right: 1px solid var(--line);
+        transform: rotate(45deg);
+      }
+      .flow-step:last-child .flow-arrow {
+        display: none;
+      }
+
+      .role-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .role-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        padding: 26px 24px;
+      }
+      .role-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 18px;
+      }
+      .role-card-icon svg {
+        width: 19px;
+        height: 19px;
+        stroke-width: 1.8;
+        fill: none;
+      }
+      .role-card h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .role-card ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-top: 14px;
+      }
+      .role-card li {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        padding-left: 16px;
+        position: relative;
+        line-height: 1.5;
+      }
+      .role-card li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 6px;
+        width: 6px;
+        height: 6px;
+        background: var(--line);
+      }
+
+      footer {
+        background: var(--navy);
+        padding: 40px;
+        text-align: center;
+      }
+      footer p {
+        font-size: 12px;
+        color: var(--on-navy-faint);
+        font-family: var(--mono);
+      }
+
+      /* ── DASHBOARD SHELL (dark surface — flat, no blur/glow) ──── */
+      .dash-wrap {
+        display: none;
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        padding: 84px 44px 56px;
+        max-width: 1180px;
+        margin: 0 auto;
+        background: var(--paper);
+      }
+      body.dash-active {
+        background: var(--mist);
+      }
+
+      .dash-hd {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+      }
+      .dash-title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 5px;
+      }
+      .dash-title {
+        font-family: var(--disp);
+        font-size: 25px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+      }
+      .dash-sub {
+        font-size: 13.5px;
+        color: var(--ink-soft);
+      }
+
+      .rbadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 3px;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .rbadge.org {
+        background: rgba(0, 118, 206, 0.1);
+        color: var(--blue);
+      }
+      .rbadge.jdg {
+        background: rgba(146, 96, 12, 0.1);
+        color: var(--amber);
+      }
+      .rbadge.prt {
+        background: rgba(21, 122, 78, 0.1);
+        color: var(--green);
+      }
+
+      .out-btn {
+        padding: 8px 16px;
+        background: var(--paper);
+        border: 1.5px solid var(--line);
+        color: var(--ink-soft);
+        border-radius: var(--r-sm);
+        font: 600 12px/1 var(--font);
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .out-btn:hover {
+        color: var(--ink);
+        border-color: #b8c2cc;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .metrics.g4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .metrics.g3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .mc {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        padding: 18px 20px;
+        transition: border-color 0.15s;
+      }
+      .mc:hover {
+        border-color: #b8c2cc;
+      }
+
+      .mc-lbl {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .mc-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 5px;
+        background: rgba(0, 118, 206, 0.1);
+        display: grid;
+        place-items: center;
+      }
+      .mc-icon svg {
+        width: 12px;
+        height: 12px;
+        stroke: var(--blue);
+        stroke-width: 1.8;
+        fill: none;
+      }
+      .mc-val {
+        font-family: var(--disp);
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .mc-note {
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .mc-note.up {
+        color: var(--green);
+      }
+      .mc-note.flat {
+        color: var(--ink-soft);
+      }
+      .mc-note.warn {
+        color: var(--amber);
+      }
+
+      .prog-bar {
+        height: 4px;
+        background: var(--mist-2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .prog-fill {
+        height: 100%;
+        background: var(--blue);
+        border-radius: 2px;
+        transition: width 1s ease;
+      }
+
+      .dash-body {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--r-card);
+        padding: 20px 22px;
+      }
+      .panel-hd {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .panel-title {
+        font-family: var(--disp);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+      }
+      .panel-act {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--blue);
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: var(--font);
+        padding: 4px 9px;
+        border-radius: 4px;
+        transition: background 0.15s;
+      }
+      .panel-act:hover {
+        background: rgba(0, 118, 206, 0.08);
+      }
+
+      .irow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 6px;
+        border-bottom: 1px solid var(--mist-2);
+        transition: background 0.12s;
+        border-radius: 5px;
+        margin: 0 -6px;
+      }
+      .irow:last-child {
+        border-bottom: none;
+      }
+      .irow:hover {
+        background: var(--mist);
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        background: var(--mist);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .avatar svg {
+        width: 15px;
+        height: 15px;
+        stroke: var(--ink-soft);
+        stroke-width: 1.5;
+        fill: none;
+      }
+      .avatar.blue {
+        background: rgba(0, 118, 206, 0.08);
+        border-color: rgba(0, 118, 206, 0.18);
+      }
+      .avatar.blue svg {
+        stroke: var(--blue);
+      }
+      .avatar.amber {
+        background: rgba(146, 96, 12, 0.08);
+        border-color: rgba(146, 96, 12, 0.18);
+      }
+      .avatar.amber svg {
+        stroke: var(--amber);
+      }
+      .avatar.green {
+        background: rgba(21, 122, 78, 0.08);
+        border-color: rgba(21, 122, 78, 0.18);
+      }
+      .avatar.green svg {
+        stroke: var(--green);
+      }
+
+      .iinfo {
+        flex: 1;
+      }
+      .iname {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .isub {
+        font-size: 11px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .imeta {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        text-align: right;
+      }
+      .imeta strong {
+        color: var(--ink);
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .pill {
+        padding: 3px 9px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .pill.live {
+        background: rgba(21, 122, 78, 0.1);
+        color: var(--green);
+      }
+      .pill.review {
+        background: rgba(146, 96, 12, 0.1);
+        color: var(--amber);
+      }
+      .pill.upcoming {
+        background: rgba(0, 118, 206, 0.1);
+        color: var(--blue);
+      }
+
+      .qas {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .qa {
+        width: 100%;
+        padding: 11px 13px;
+        background: var(--mist);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--ink-soft);
+        font: 600 13px/1 var(--font);
+        cursor: pointer;
+        transition: all 0.15s;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      .qa svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        fill: none;
+        flex-shrink: 0;
+      }
+      .qa:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(0, 118, 206, 0.05);
+      }
+
+      .insight {
+        padding: 12px 13px;
+        border-radius: var(--r-sm);
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        border-left: 3px solid;
+      }
+      .insight + .insight {
+        margin-top: 8px;
+      }
+      .insight.info {
+        background: rgba(0, 118, 206, 0.05);
+        border-left-color: var(--blue);
+      }
+      .insight.warn {
+        background: rgba(146, 96, 12, 0.05);
+        border-left-color: var(--amber);
+      }
+      .insight.good {
+        background: rgba(21, 122, 78, 0.05);
+        border-left-color: var(--green);
+      }
+      .insight strong {
+        color: var(--ink);
+      }
+      .insight-label {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .insight-label.info {
+        color: var(--blue);
+      }
+      .insight-label.warn {
+        color: var(--amber);
+      }
+      .insight-label.good {
+        color: var(--green);
+      }
+
+      .srow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--mist-2);
+      }
+      .srow:last-child {
+        border-bottom: none;
+      }
+      .sinfo {
+        flex: 1;
+      }
+      .sname {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .strack {
+        font-size: 11px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .sinput {
+        width: 58px;
+        padding: 7px 10px;
+        background: var(--mist);
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--ink);
+        font: 600 13px var(--mono);
+        text-align: center;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .sinput:focus {
+        border-color: var(--blue);
+      }
+      .smax {
+        font-size: 11px;
+        color: var(--ink-soft);
+      }
+
+      .rubric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--mist-2);
+        font-size: 12.5px;
+      }
+      .rubric-row:last-child {
+        border-bottom: none;
+      }
+      .rubric-row span {
+        color: var(--ink-soft);
+      }
+      .rubric-row strong {
+        color: var(--ink);
+        font-weight: 700;
+        font-family: var(--mono);
+      }
+
+      .tl {
+        display: flex;
+        flex-direction: column;
+      }
+      .tl-item {
+        display: flex;
+        gap: 14px;
+        padding-bottom: 20px;
+        position: relative;
+      }
+      .tl-item:last-child {
+        padding-bottom: 0;
+      }
+      .tl-item:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 11px;
+        top: 26px;
+        bottom: 0;
+        width: 1px;
+        background: var(--line);
+      }
+      .tl-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      .tl-dot.done {
+        background: rgba(21, 122, 78, 0.1);
+        border: 1.5px solid var(--green);
+      }
+      .tl-dot.active {
+        background: rgba(0, 118, 206, 0.1);
+        border: 1.5px solid var(--blue);
+      }
+      .tl-dot.pend {
+        background: var(--mist);
+        border: 1.5px solid var(--line);
+      }
+      .tl-dot svg {
+        width: 10px;
+        height: 10px;
+        stroke-width: 2.5;
+        fill: none;
+      }
+      .tl-dot.done svg {
+        stroke: var(--green);
+      }
+      .tl-dot.active svg {
+        stroke: var(--blue);
+      }
+      .tl-dot.pend svg {
+        stroke: var(--ink-soft);
+      }
+      .tl-content {
+        padding-top: 2px;
+      }
+      .tl-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .tl-time {
+        font-size: 11px;
+        color: var(--ink-soft);
+        margin-top: 3px;
+      }
+
+      .odot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .odot.on {
+        background: var(--green);
+      }
+      .odot.away {
+        background: var(--amber);
+      }
+
+      .sub-field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .sub-field label {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--ink-soft);
+      }
+      .sub-field input {
+        padding: 10px 12px;
+        background: var(--mist);
+        border: 1.5px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--ink);
+        font: 400 13px var(--font);
+        outline: none;
+        transition: border-color 0.15s;
+        width: 100%;
+      }
+      .sub-field input:focus {
+        border-color: var(--blue);
+      }
+
+      .sep {
+        border: none;
+        border-top: 1px solid var(--line);
+        margin: 20px 0;
+      }
+
+      .btn-secondary {
+        padding: 11px 18px;
+        background: var(--paper);
+        border: 1.5px solid var(--line);
+        color: var(--ink-soft);
+        border-radius: var(--r-sm);
+        font: 700 13px/1 var(--font);
+        cursor: pointer;
+      }
+      .btn-secondary:hover {
+        border-color: #b8c2cc;
+      }
+      .btn-primary {
+        padding: 11px 22px;
+        background: var(--blue);
+        border: none;
+        color: #fff;
+        border-radius: var(--r-sm);
+        font: 700 13px/1 var(--font);
+        cursor: pointer;
+      }
+      .btn-primary:hover {
+        background: var(--blue-dark);
+      }
+
+      .fade-up {
+        animation: fadeUp 0.4s ease both;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-up-d1 {
+        animation-delay: 0.06s;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-band::before,
+        .hero-band::after {
+          display: none;
+        }
+        .auth-card {
+          transform: none;
+          margin-bottom: -1px;
+        }
+        .hero h1 {
+          font-size: 38px;
+        }
+        .metrics.g4 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .dash-body {
+          grid-template-columns: 1fr;
+        }
+        .dash-wrap {
+          padding: 78px 20px 40px;
+        }
+        nav {
+          padding: 0 20px;
+        }
+        .flow-grid {
+          grid-template-columns: 1fr;
+        }
+        .flow-step {
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+        .flow-arrow {
+          display: none;
+        }
+        .role-cards {
+          grid-template-columns: 1fr;
+        }
+        .lite-section {
+          padding: 56px 20px;
+        }
+        .stats {
+          flex-wrap: wrap;
+          row-gap: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="nav-brand" href="#">
+        <div class="logo-mark">H</div>
+        <div class="brand-stack">
+          <span class="brand-name">HackBridge</span>
+          <span class="brand-sub">Powered by Dell Technologies</span>
+        </div>
+      </a>
+      <div class="nav-right" id="navRight">
+        <button class="btn-ghost" onclick="showTab('login')">Sign in</button>
+        <button class="btn-fill" onclick="showTab('signup')">
+          Get started
+        </button>
+      </div>
+    </nav>
+
+    <!-- ═══════════════════ LANDING ═══════════════════ -->
+    <div class="page" id="landingPage">
+      <div class="hero-band">
+        <div class="hero-grid">
+          <!-- Hero -->
+          <div class="hero fade-up">
+            <div class="live-pill">
+              <div class="live-dot"></div>
+              <span class="live-text">Platform live · AI-assisted judging</span>
+            </div>
+
+            <h1>
+              Run the whole hackathon.<span>One platform, every role.</span
+              ><span class="underscore"></span>
+            </h1>
+
+            <p class="hero-sub">
+              HackBridge brings registration, team formation, submissions, and
+              judging into a single dashboard — built by Dell Technologies for
+              organizers running events at any scale, from a 40-person campus
+              hack to a global innovation challenge.
+            </p>
+
+            <div class="trust-row">
+              <span class="trust-label">Built for</span>
+              <div class="trust-chips">
+                <span class="trust-chip">Enterprises</span>
+                <span class="trust-chip">Universities</span>
+                <span class="trust-chip">Startups</span>
+                <span class="trust-chip">Government bodies</span>
+              </div>
+            </div>
+
+            <div class="stats">
+              <div class="stat-item">
+                <span class="stat-num" data-target="10000">0</span>
+                <span class="stat-lbl">Hackathons hosted</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-num" data-target="500000">0</span>
+                <span class="stat-lbl">Participants</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-num" data-target="85" data-suffix="%">0</span>
+                <span class="stat-lbl">Organizer time saved</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auth card -->
+          <div class="auth-card fade-up fade-up-d1">
+            <div class="card-top">
+              <div class="tabs">
+                <button class="tab on" id="tabLogin" onclick="showTab('login')">
+                  Sign in
+                </button>
+                <button class="tab" id="tabSignup" onclick="showTab('signup')">
+                  Register
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Role picker -->
+              <span class="role-lbl">I am joining as</span>
+              <div class="role-grid">
+                <div
+                  class="role-tile"
+                  id="rt-organizer"
+                  onclick="pickRole('organizer')"
+                >
+                  <div class="tile-check">
+                    <svg viewBox="0 0 10 8">
+                      <polyline points="1,4 4,7 9,1" />
+                    </svg>
+                  </div>
+                  <div class="tile-icon blue">
+                    <svg
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-width="1.8"
+                    >
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                  </div>
+                  <div class="tile-name">Event host</div>
+                  <div class="tile-desc">Create &amp; manage events</div>
+                </div>
+
+                <div
+                  class="role-tile"
+                  id="rt-judge"
+                  onclick="pickRole('judge')"
+                >
+                  <div class="tile-check">
+                    <svg viewBox="0 0 10 8">
+                      <polyline points="1,4 4,7 9,1" />
+                    </svg>
+                  </div>
+                  <div class="tile-icon amber">
+                    <svg
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-width="1.8"
+                    >
+                      <path d="M12 3L4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7L12 3z" />
+                    </svg>
+                  </div>
+                  <div class="tile-name">Judge</div>
+                  <div class="tile-desc">Evaluate submissions</div>
+                </div>
+
+                <div
+                  class="role-tile"
+                  id="rt-participant"
+                  onclick="pickRole('participant')"
+                >
+                  <div class="tile-check">
+                    <svg viewBox="0 0 10 8">
+                      <polyline points="1,4 4,7 9,1" />
+                    </svg>
+                  </div>
+                  <div class="tile-icon green">
+                    <svg
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-width="1.8"
+                    >
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </div>
+                  <div class="tile-name">Participant</div>
+                  <div class="tile-desc">Join &amp; submit projects</div>
+                </div>
+
+                <div
+                  class="role-tile"
+                  id="rt-admin"
+                  onclick="pickRole('admin')"
+                >
+                  <div class="tile-check">
+                    <svg viewBox="0 0 10 8">
+                      <polyline points="1,4 4,7 9,1" />
+                    </svg>
+                  </div>
+                  <div class="tile-icon gray">
+                    <svg
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-width="1.8"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 1 19.07 19.07"
+                      />
+                    </svg>
+                  </div>
+                  <div class="tile-name">Admin</div>
+                  <div class="tile-desc">Platform management</div>
+                </div>
+              </div>
+
+              <!-- LOGIN -->
+              <div id="formLogin" class="form-body">
+                <div class="field">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    placeholder="you@yourcompany.com"
+                    autocomplete="email"
+                  />
+                </div>
+                <div class="field">
+                  <label>Password</label>
+                  <input type="password" placeholder="••••••••" />
+                  <a
+                    class="form-link"
+                    onclick="alert('Reset link sent to your email.')"
+                    >Forgot password?</a
+                  >
+                </div>
+                <span class="err-msg" id="errLogin"
+                  >Please select a role to continue.</span
+                >
+                <button class="cta-btn" onclick="doLogin()">
+                  Sign in &nbsp;→
+                </button>
+                <div class="divider">or continue with</div>
+                <button class="sso-btn" onclick="doLogin()">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Continue with single sign-on
+                </button>
+                <p class="form-note">
+                  Works with your organization's existing identity provider.
+                </p>
+              </div>
+
+              <!-- SIGNUP -->
+              <div id="formSignup" class="form-body" style="display: none">
+                <div class="row2">
+                  <div class="field">
+                    <label>First name</label><input type="text" id="su-fname" placeholder="Alex" />
+                  </div>
+                  <div class="field">
+                    <label>Last name</label><input type="text" id="su-lname" placeholder="Chen" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Email</label><input type="email" id="su-email" placeholder="alex@yourcompany.com" />
+                </div>
+                <div class="field">
+                  <label>Bio (for AI Skill Match)</label><input type="text" id="su-bio" placeholder="e.g. Python, React developer" />
+                </div>
+                <div class="field">
+                  <label>Password</label><input type="password" placeholder="Min. 8 characters" />
+                </div>
+                <span class="err-msg" id="errSignup"
+                  >Please select a role to continue.</span
+                >
+                <button class="cta-btn" onclick="doSignup()">
+                  Create account &nbsp;→
+                </button>
+                <div class="divider">or</div>
+                <button class="sso-btn" onclick="doSignup()">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Register with single sign-on
+                </button>
+                <p class="form-note">
+                  By registering you agree to HackBridge's
+                  <a href="#">event participation terms</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="lite-section">
+        <div class="section-inner">
+          <div class="eyebrow">How it works</div>
+          <div class="section-head">
+            <h2>Four roles. One timeline. Zero spreadsheets.</h2>
+            <p>
+              Every stage of a hackathon — from the first registration to the
+              final leaderboard — runs through the same system, so nothing falls
+              through the cracks between teams, judges, and organizers.
+            </p>
+          </div>
+          <div class="flow-grid">
+            <div class="flow-step">
+              <div class="flow-num">01 — Register</div>
+              <h3>Teams form fast</h3>
+              <p>
+                Participants sign up, get matched into balanced teams by skill,
+                and submit project ideas before the clock starts.
+              </p>
+              <div class="flow-arrow"></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">02 — Build</div>
+              <h3>Track progress live</h3>
+              <p>
+                Organizers see registrations, team status, and submission counts
+                update in real time across every track.
+              </p>
+              <div class="flow-arrow"></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">03 — Judge</div>
+              <h3>Score with AI assist</h3>
+              <p>
+                Judges score against a shared rubric while flagged similarities
+                and bias indices surface automatically.
+              </p>
+              <div class="flow-arrow"></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">04 — Announce</div>
+              <h3>Publish instantly</h3>
+              <p>
+                Leaderboards, winners, and certificates go out the moment
+                judging closes — no manual tallying.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROLES -->
+      <div class="lite-section alt">
+        <div class="section-inner">
+          <div class="eyebrow">Built for every seat at the table</div>
+          <div class="section-head">
+            <h2>
+              The same platform, tuned to what each role actually needs to do.
+            </h2>
+          </div>
+          <div class="role-cards">
+            <div class="role-card">
+              <div
+                class="role-card-icon"
+                style="background: rgba(0, 118, 206, 0.1)"
+              >
+                <svg viewBox="0 0 24 24" stroke="var(--blue)">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+              </div>
+              <h3>Event hosts</h3>
+              <p
+                style="
+                  font-size: 13px;
+                  color: var(--ink-soft);
+                  line-height: 1.6;
+                "
+              >
+                Launch and run multiple hackathons from one console.
+              </p>
+              <ul>
+                <li>Live registration &amp; submission tracking</li>
+                <li>One-click broadcast announcements</li>
+                <li>AI-surfaced insights on flagged entries</li>
+              </ul>
+            </div>
+            <div class="role-card">
+              <div
+                class="role-card-icon"
+                style="background: rgba(146, 96, 12, 0.1)"
+              >
+                <svg viewBox="0 0 24 24" stroke="var(--amber)">
+                  <path d="M12 3L4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7L12 3z" />
+                </svg>
+              </div>
+              <h3>Judges</h3>
+              <p
+                style="
+                  font-size: 13px;
+                  color: var(--ink-soft);
+                  line-height: 1.6;
+                "
+              >
+                Score consistently against a shared rubric.
+              </p>
+              <ul>
+                <li>Assigned queue with deadline tracking</li>
+                <li>Similarity &amp; plagiarism alerts</li>
+                <li>Personal bias index for fairness</li>
+              </ul>
+            </div>
+            <div class="role-card">
+              <div
+                class="role-card-icon"
+                style="background: rgba(21, 122, 78, 0.1)"
+              >
+                <svg viewBox="0 0 24 24" stroke="var(--green)">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+              </div>
+              <h3>Participants</h3>
+              <p
+                style="
+                  font-size: 13px;
+                  color: var(--ink-soft);
+                  line-height: 1.6;
+                "
+              >
+                Stay on top of deadlines without the group-chat chaos.
+              </p>
+              <ul>
+                <li>Live rank &amp; team status</li>
+                <li>Guided event timeline</li>
+                <li>AI coach for submission feedback</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>HACKBRIDGE — POWERED BY DELL TECHNOLOGIES</p>
+      </footer>
+    </div>
+
+    <!-- ═══════════════════ ORGANIZER DASH ═══════════════════ -->
+    <div class="dash-wrap" id="dashOrg">
+      <div class="dash-hd">
+        <div>
+          <div class="dash-title-row">
+            <h2 class="dash-title">Welcome back, Alex</h2>
+            <span class="rbadge org">Event host</span>
+          </div>
+          <p class="dash-sub">
+            Here's what's happening across your active hackathons today.
+          </p>
+        </div>
+        <button class="out-btn" onclick="doLogout()">
+          <svg
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+            fill="none"
+            width="13"
+            height="13"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign out
+        </button>
+      </div>
+
+      <div class="metrics g4">
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            Active events
+          </div>
+          <div class="mc-val">3</div>
+          <div class="mc-note up">↑ 1 launched this week</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            Participants
+          </div>
+          <div class="mc-val">847</div>
+          <div class="mc-note up">↑ 124 registered today</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            Submissions
+          </div>
+          <div class="mc-val">312</div>
+          <div class="mc-note flat">68% review complete</div>
+          <div class="prog-bar">
+            <div class="prog-fill" style="width: 68%"></div>
+          </div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            Completion rate
+          </div>
+          <div class="mc-val">91%</div>
+          <div class="mc-note up">↑ 6% vs last event</div>
+        </div>
+      </div>
+
+      <div class="dash-body">
+        <div>
+          <div class="panel" style="margin-bottom: 18px">
+            <div class="panel-hd">
+              <span class="panel-title">Active hackathons</span>
+              <button class="panel-act">+ New event</button>
+            </div>
+            <div class="irow">
+              <div class="avatar blue">
+                <svg viewBox="0 0 24 24">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">AI for Sustainable Infrastructure</div>
+                <div class="isub">248 teams · Ends in 14 hours</div>
+              </div>
+              <span class="pill live">Live</span>
+            </div>
+            <div class="irow">
+              <div class="avatar amber">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Zero-Trust Security Challenge</div>
+                <div class="isub">183 teams · Review phase</div>
+              </div>
+              <span class="pill review">Review</span>
+            </div>
+            <div class="irow">
+              <div class="avatar green">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Cloud-Native Modernization Hack</div>
+                <div class="isub">416 registered · Starts in 3 days</div>
+              </div>
+              <span class="pill upcoming">Upcoming</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-hd">
+              <span class="panel-title">Recent registrations</span>
+              <button class="panel-act">View all</button>
+            </div>
+            <div class="irow">
+              <div class="avatar blue">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Priya Mehta</div>
+                <div class="isub">priya.mehta@techcorp.in · Full Stack</div>
+              </div>
+              <div class="imeta"><strong>2 min ago</strong>Participant</div>
+            </div>
+            <div class="irow">
+              <div class="avatar">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Marcus Williams</div>
+                <div class="isub">m.williams@startup.io · ML Engineer</div>
+              </div>
+              <div class="imeta"><strong>9 min ago</strong>Participant</div>
+            </div>
+            <div class="irow">
+              <div class="avatar amber">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Dr. Aiko Tanaka</div>
+                <div class="isub">a.tanaka@university.jp · Judge</div>
+              </div>
+              <div class="imeta"><strong>23 min ago</strong>Judge</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom: 18px">
+            <div class="panel-hd">
+              <span class="panel-title">Quick actions</span>
+            </div>
+            <div class="qas">
+              <button class="qa" onclick="doAssignReviewers()">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 11l18-5v12L3 13v-2z" />
+                  <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+                </svg>
+                AI Reviewer Assignment
+              </button>
+              <button class="qa" onclick="doDetectBias()">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                  />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                Run AI Bias Detection
+              </button>
+              <button class="qa" onclick="alert('Leaderboard published!')">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="8" r="6" />
+                  <path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5" />
+                </svg>
+                Publish leaderboard
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-hd">
+              <span class="panel-title">AI insights</span>
+            </div>
+            <div class="insight info">
+              <span class="insight-label info">Automation</span>
+              24 duplicate registrations removed automatically. Skill clustering
+              complete — team formation ready.
+            </div>
+            <div class="insight warn">
+              <span class="insight-label warn">Attention required</span>
+              3 submissions flagged for similarity. Manual review recommended
+              before scoring.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ JUDGE DASH ═══════════════════ -->
+    <div class="dash-wrap" id="dashJudge">
+      <div class="dash-hd">
+        <div>
+          <div class="dash-title-row">
+            <h2 class="dash-title">Judge panel</h2>
+            <span class="rbadge jdg">Judge</span>
+          </div>
+          <p class="dash-sub">
+            AI for Sustainable Infrastructure · Round 2 evaluation
+          </p>
+        </div>
+        <button class="out-btn" onclick="doLogout()">
+          <svg
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+            fill="none"
+            width="13"
+            height="13"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign out
+        </button>
+      </div>
+
+      <div class="metrics g3">
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </div>
+            Assigned to me
+          </div>
+          <div class="mc-val">18</div>
+          <div class="mc-note flat">6 remaining</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            Reviewed
+          </div>
+          <div class="mc-val">12</div>
+          <div class="mc-note up">67% complete</div>
+          <div class="prog-bar">
+            <div class="prog-fill" style="width: 67%"></div>
+          </div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            Deadline
+          </div>
+          <div class="mc-val" style="color: var(--amber)">8h 40m</div>
+          <div class="mc-note warn">Today, 11:59 PM IST</div>
+        </div>
+      </div>
+
+      <div class="dash-body">
+        <div class="panel">
+          <div class="panel-hd">
+            <span class="panel-title">Score submissions</span>
+            <button class="panel-act">Filter by track</button>
+          </div>
+          <div class="srow">
+            <div class="sinfo">
+              <div class="sname">GreenOps — Carbon Footprint Monitor</div>
+              <div class="strack">
+                Track: Sustainability · Team: NullPointers
+              </div>
+            </div>
+            <input class="sinput" value="—" maxlength="3" />
+            <span class="smax">/100</span>
+          </div>
+          <div class="srow">
+            <div class="sinfo">
+              <div class="sname">EcoEdge — Renewable Energy Router</div>
+              <div class="strack">
+                Track: Sustainability · Team: ByteBuilders
+              </div>
+            </div>
+            <input class="sinput" value="87" maxlength="3" />
+            <span class="smax">/100</span>
+          </div>
+          <div class="srow">
+            <div class="sinfo">
+              <div class="sname">ClearSky — Air Quality Predictor</div>
+              <div class="strack">Track: AI/ML · Team: SegFault Squad</div>
+            </div>
+            <input class="sinput" value="92" maxlength="3" />
+            <span class="smax">/100</span>
+          </div>
+          <div class="srow">
+            <div class="sinfo">
+              <div class="sname">WaterFlow — Smart Irrigation AI</div>
+              <div class="strack">Track: AI/ML · Team: The Compilers</div>
+            </div>
+            <input class="sinput" value="—" maxlength="3" />
+            <span class="smax">/100</span>
+          </div>
+          <hr class="sep" />
+          <button class="cta-btn" onclick="alert('Scores saved & submitted.')">
+            Save &amp; submit scores
+          </button>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom: 18px">
+            <div class="panel-hd">
+              <span class="panel-title">AI judging assist</span>
+            </div>
+            <div class="insight info">
+              <span class="insight-label info">Top performer</span>
+              <strong>ClearSky</strong> ranks #1 in innovation across all 248
+              submissions.
+            </div>
+            <div class="insight warn">
+              <span class="insight-label warn">Similarity alert</span>
+              GreenOps README shares structural patterns with 2 other entries.
+              Recommend manual review.
+            </div>
+            <div class="insight good">
+              <span class="insight-label good">Bias index</span>
+              Your scoring bias index is <strong>0.12 (low)</strong> —
+              consistent with panel average.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-hd">
+              <span class="panel-title">Scoring rubric</span>
+            </div>
+            <div class="rubric-row">
+              <span>Innovation &amp; novelty</span><strong>30 pts</strong>
+            </div>
+            <div class="rubric-row">
+              <span>Technical execution</span><strong>30 pts</strong>
+            </div>
+            <div class="rubric-row">
+              <span>Business impact</span><strong>25 pts</strong>
+            </div>
+            <div class="rubric-row">
+              <span>Presentation quality</span><strong>15 pts</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PARTICIPANT DASH ═══════════════════ -->
+    <div class="dash-wrap" id="dashPart">
+      <div class="dash-hd">
+        <div>
+          <div class="dash-title-row">
+            <h2 class="dash-title">My hackathon hub</h2>
+            <span class="rbadge prt">Participant</span>
+          </div>
+          <p class="dash-sub">
+            AI for Sustainable Infrastructure · Team: NullPointers · Track:
+            Sustainability
+          </p>
+        </div>
+        <button class="out-btn" onclick="doLogout()">
+          <svg
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+            fill="none"
+            width="13"
+            height="13"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sign out
+        </button>
+      </div>
+
+      <div class="metrics g3">
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            Time remaining
+          </div>
+          <div class="mc-val" style="color: var(--amber)" id="countdown">
+            14h 22m
+          </div>
+          <div class="mc-note warn">Submission closes 11:59 PM</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5" />
+              </svg>
+            </div>
+            Current rank
+          </div>
+          <div class="mc-val">#47</div>
+          <div class="mc-note up">↑ 12 spots since last update</div>
+        </div>
+        <div class="mc">
+          <div class="mc-lbl">
+            <div class="mc-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            Team members
+          </div>
+          <div class="mc-val">4</div>
+          <div class="mc-note flat">All online now</div>
+        </div>
+      </div>
+
+      <div class="dash-body">
+        <div class="panel">
+          <div class="panel-hd">
+            <span class="panel-title">Event timeline</span>
+          </div>
+          <div class="tl">
+            <div class="tl-item">
+              <div class="tl-dot done">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="tl-content">
+                <div class="tl-title">Registration confirmed</div>
+                <div class="tl-time">Yesterday, 4:30 PM IST</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot done">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="tl-content">
+                <div class="tl-title">
+                  Team formed — NullPointers (4 members)
+                </div>
+                <div class="tl-time">Yesterday, 6:15 PM IST</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot active">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+              </div>
+              <div class="tl-content">
+                <div class="tl-title">Build phase — in progress</div>
+                <div class="tl-time">Now · 14h 22m remaining</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot pend">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+              </div>
+              <div class="tl-content">
+                <div class="tl-title">Final submission</div>
+                <div class="tl-time">Today, 11:59 PM IST</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot pend">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+              </div>
+              <div class="tl-content">
+                <div class="tl-title">Results &amp; winner announcement</div>
+                <div class="tl-time">Tomorrow, 2:00 PM IST</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="sep" />
+
+          <div class="panel-hd" style="margin-bottom: 14px">
+            <span class="panel-title">My submission</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="sub-field">
+              <label>Project title</label>
+              <input type="text" value="GreenOps — Carbon Footprint Monitor" />
+            </div>
+            <div class="sub-field">
+              <label>GitHub repository</label>
+              <input
+                type="text"
+                value="https://github.com/nullpointers/greenops"
+              />
+            </div>
+            <div style="display: flex; gap: 10px">
+              <button class="btn-secondary" onclick="alert('Draft saved.')">
+                Save draft
+              </button>
+              <button
+                class="btn-primary"
+                style="flex: 1"
+                onclick="alert('Submitted!')"
+              >
+                Final submit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom: 18px">
+            <div class="panel-hd">
+              <span class="panel-title">Team — NullPointers</span>
+            </div>
+            <div class="irow">
+              <div class="avatar blue">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Alex (You) · Lead</div>
+                <div class="isub">Backend &amp; architecture</div>
+              </div>
+              <div class="odot on"></div>
+            </div>
+            <div class="irow">
+              <div class="avatar">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Rohan Sharma</div>
+                <div class="isub">Frontend · React</div>
+              </div>
+              <div class="odot on"></div>
+            </div>
+            <div class="irow">
+              <div class="avatar green">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Sneha Patel</div>
+                <div class="isub">ML engineering</div>
+              </div>
+              <div class="odot on"></div>
+            </div>
+            <div class="irow">
+              <div class="avatar amber">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="iinfo">
+                <div class="iname">Dev Kumar</div>
+                <div class="isub">DevOps · Cloud</div>
+              </div>
+              <div class="odot away"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-hd">
+              <span class="panel-title">AI coach</span>
+            </div>
+            <div class="insight info">
+              <span class="insight-label info">Recommendation</span>
+              Your project scores high on innovation. Adding a
+              <strong>demo video</strong> could raise presentation score by ~8
+              pts.
+            </div>
+            <div class="insight good">
+              <span class="insight-label good">Standing</span>
+              You are in the <strong>top 20%</strong> of all submissions. Keep
+              building.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ─── State ──────────────────────────────── */
+      let role = null;
+
+      /* ─── Role picker ──────────────────────── */
+      function pickRole(r) {
+        role = r;
+        document
+          .querySelectorAll(".role-tile")
+          .forEach((t) => t.classList.remove("chosen"));
+        document.getElementById("rt-" + r).classList.add("chosen");
+        document.getElementById("errLogin").style.display = "none";
+        document.getElementById("errSignup").style.display = "none";
+      }
+
+      /* ─── Tabs ───────────────────────────────── */
+      function showTab(t) {
+        document.getElementById("formLogin").style.display =
+          t === "login" ? "flex" : "none";
+        document.getElementById("formSignup").style.display =
+          t === "signup" ? "flex" : "none";
+        document
+          .getElementById("tabLogin")
+          .classList.toggle("on", t === "login");
+        document
+          .getElementById("tabSignup")
+          .classList.toggle("on", t === "signup");
+      }
+
+      /* ─── Auth ───────────────────────────────── */
+      function doLogin() {
+        if (!role) {
+          document.getElementById("errLogin").style.display = "block";
+          return;
+        }
+        showDash(role);
+      }
+      async function doSignup() {
+        if (!role) {
+          document.getElementById("errSignup").style.display = "block";
+          document.getElementById("errSignup").textContent = "Please select a role to continue.";
+          return;
+        }
+
+        const fname = document.getElementById("su-fname").value;
+        const lname = document.getElementById("su-lname").value;
+        const email = document.getElementById("su-email").value;
+        const bio = document.getElementById("su-bio").value;
+
+        try {
+          const res = await fetch("/api/ai/dedupe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email || "test@test.com", first_name: fname || "test", last_name: lname || "test" })
+          });
+          const data = await res.json();
+          if (data.is_duplicate) {
+             alert(`AI WARNING: Duplicate account detected! Confidence: ${data.match_confidence}%\nRegistration blocked & logged to audit trail.`);
+             return; // Stop them from logging in!
+          }
+
+          if (bio) {
+             const skillRes = await fetch("/api/ai/extract-skills", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bio })
+             });
+             const skillData = await skillRes.json();
+             if (skillData.skills && skillData.skills.length > 0) {
+                 alert(`AI EXTRACTED SKILLS: ${skillData.skills.join(", ")}`);
+             }
+          }
+
+        } catch(e) {
+          console.error("API error", e);
+        }
+
+        showDash(role);
+      }
+
+      async function doAssignReviewers() {
+         try {
+           const res = await fetch("/api/ai/assign-reviewers", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ hackathon_id: "72a2344f-3405-4b3e-8e10-2dba6f6841bb" })
+           });
+           const data = await res.json();
+           alert(`AI ASSIGNMENT COMPLETE:\nAssigned ${data.count} perfect judge-project pairs using the Hungarian Algorithm & semantic embeddings!`);
+         } catch(e) {
+           console.error("API error", e);
+           alert("Make sure the FastAPI backend is running!");
+         }
+      }
+
+      async function doDetectBias() {
+         try {
+           const res = await fetch("/api/ai/detect-bias", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ hackathon_id: "72a2344f-3405-4b3e-8e10-2dba6f6841bb" })
+           });
+           const data = await res.json();
+           let msg = `AI BIAS DETECTION COMPLETE:\nFlagged ${data.count} anomalous evaluations.\n\n`;
+           data.flagged_evaluations.forEach(ev => {
+              msg += `Score: ${ev.total_score} (Mean: ${ev.mean}, Z-Score: ${ev.z_score})\n`;
+           });
+           alert(msg);
+         } catch(e) {
+           console.error("API error", e);
+           alert("Make sure the FastAPI backend is running!");
+         }
+      }
+
+      /* ─── Dashboard routing ──────────────────── */
+      const dashMap = {
+        organizer: "dashOrg",
+        judge: "dashJudge",
+        participant: "dashPart",
+        admin: "dashOrg",
+      };
+
+      function showDash(r) {
+        document.getElementById("landingPage").style.display = "none";
+        document.body.classList.add("dash-active");
+        document.getElementById(
+          "navRight"
+        ).innerHTML = `<span class="nav-status"><span class="dot"></span>Signed in</span>`;
+        const el = document.getElementById(dashMap[r] || "dashPart");
+        el.style.display = "block";
+        el.classList.add("fade-up");
+        window.scrollTo(0, 0);
+      }
+
+      function doLogout() {
+        ["dashOrg", "dashJudge", "dashPart"].forEach(
+          (id) => (document.getElementById(id).style.display = "none")
+        );
+        document.getElementById("landingPage").style.display = "block";
+        document.body.classList.remove("dash-active");
+        document.getElementById(
+          "navRight"
+        ).innerHTML = `<button class="btn-ghost" onclick="showTab('login')">Sign in</button>
+     <button class="btn-fill" onclick="showTab('signup')">Get started</button>`;
+        role = null;
+        document
+          .querySelectorAll(".role-tile")
+          .forEach((t) => t.classList.remove("chosen"));
+        startCountUp();
+      }
+
+      /* ─── Count-up animation ─────────────────── */
+      function startCountUp() {
+        document.querySelectorAll(".stat-num").forEach((el) => {
+          const target = +el.dataset.target;
+          const suffix = el.dataset.suffix || "";
+          const dur = 1400;
+          const start = performance.now();
+          function frame(now) {
+            const p = Math.min((now - start) / dur, 1);
+            const ease = 1 - Math.pow(1 - p, 3);
+            const val = Math.round(target * ease);
+            el.textContent =
+              val >= 1000
+                ? val >= 100000
+                  ? (val / 1000).toFixed(0) + "K"
+                  : val.toLocaleString()
+                : val + suffix;
+            if (p < 1) requestAnimationFrame(frame);
+            else
+              el.textContent =
+                target >= 100000 ? target / 1000 + "K" : target + suffix;
+          }
+          requestAnimationFrame(frame);
+        });
+      }
+
+      /* ─── Init ───────────────────────────────── */
+      showTab("login");
+      startCountUp();
+    </script>
+  </body>
+</html>
